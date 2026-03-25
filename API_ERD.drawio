@@ -1,0 +1,83 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.6">
+  <diagram name="Page-1" id="JO6tHhQuThrsN7JXGqod">
+    <mxGraphModel dx="1040" dy="574" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-1" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="User" vertex="1">
+          <mxGeometry height="120" width="140" x="370" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-2" parent="viTi54BJ4yCZNKOF7WoY-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="UserUUID : BINARY" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-3" parent="viTi54BJ4yCZNKOF7WoY-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Username : VARCHAR" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-4" parent="viTi54BJ4yCZNKOF7WoY-1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Password : CHAR" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-5" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="RefreshToken" vertex="1">
+          <mxGeometry height="180" width="140" x="140" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-6" parent="viTi54BJ4yCZNKOF7WoY-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="TokenID : INTEGER" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-7" parent="viTi54BJ4yCZNKOF7WoY-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="UserUUID : BINARY" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-8" parent="viTi54BJ4yCZNKOF7WoY-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Token : VARCHAR" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-13" parent="viTi54BJ4yCZNKOF7WoY-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="ExpiresAt : DATETIME" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-14" parent="viTi54BJ4yCZNKOF7WoY-5" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="IsrRevoked : BOOL" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-15" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" value="Pin" vertex="1">
+          <mxGeometry height="210" width="140" x="600" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-16" parent="viTi54BJ4yCZNKOF7WoY-15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="PinID : INTEGER" vertex="1">
+          <mxGeometry height="30" width="140" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-17" parent="viTi54BJ4yCZNKOF7WoY-15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="UserUUID : BINARY" vertex="1">
+          <mxGeometry height="30" width="140" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-18" parent="viTi54BJ4yCZNKOF7WoY-15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Title : VARCHAR" vertex="1">
+          <mxGeometry height="30" width="140" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-19" parent="viTi54BJ4yCZNKOF7WoY-15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="Body : TEXT" vertex="1">
+          <mxGeometry height="30" width="140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-20" parent="viTi54BJ4yCZNKOF7WoY-15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="ImageLink : VARCHAR" vertex="1">
+          <mxGeometry height="30" width="140" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-21" parent="viTi54BJ4yCZNKOF7WoY-15" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="CreatedAt : TIMESTAMP" vertex="1">
+          <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-22" edge="1" parent="1" source="viTi54BJ4yCZNKOF7WoY-2" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToMany;startArrow=ERmandOne;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="viTi54BJ4yCZNKOF7WoY-7" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="340" y="280" as="sourcePoint" />
+            <mxPoint x="380" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-23" connectable="0" parent="viTi54BJ4yCZNKOF7WoY-22" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Has" vertex="1">
+          <mxGeometry relative="1" x="-0.0635" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-24" edge="1" parent="1" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToMany;startArrow=ERmandOne;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="viTi54BJ4yCZNKOF7WoY-17" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="510" y="280" as="sourcePoint" />
+            <mxPoint x="610" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="viTi54BJ4yCZNKOF7WoY-25" connectable="0" parent="viTi54BJ4yCZNKOF7WoY-24" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Belongs To" vertex="1">
+          <mxGeometry relative="1" x="-0.1057" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
