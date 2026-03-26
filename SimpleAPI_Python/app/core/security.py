@@ -19,6 +19,13 @@ def hash_password(password: str) -> str:
     return hashed_password.decode("utf-8")
 
 
+def verify_password(inpt_password: str, hashed_password: str) -> bool:
+    password_bytes: bytes = inpt_password.encode("utf-8")
+    hash_bytes: bytes = hashed_password.encode("utf-8")
+
+    return bcrypt.checkpw(password=password_bytes, hashed_password=hash_bytes)
+
+
 def create_access_token(user_uuid: Union[str, Any]) -> str:
     expiry: datetime = datetime.now(timezone.utc) + timedelta(
         minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES
