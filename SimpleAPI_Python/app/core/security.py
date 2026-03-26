@@ -26,8 +26,8 @@ def create_access_token(user_uuid: Union[str, Any]) -> str:
     jwt_payload: dict = {
         "user_uuid": str(user_uuid),
         "type": "access",
-        "expiry": expiry,
-        "issued_at": datetime.now(timezone.utc),
+        "expiry": int(expiry.timestamp()),
+        "issued_at": int(datetime.now(timezone.utc).timestamp()),
     }
 
     return jwt.encode(jwt_payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
@@ -40,8 +40,8 @@ def create_refresh_token(user_uuid: Union[str, Any]) -> str:
     jwt_payload: dict = {
         "user_uuid": str(user_uuid),
         "type": "refresh",
-        "expiry": expiry,
-        "issued_at": datetime.now(timezone.utc),
+        "expiry": int(expiry.timestamp()),
+        "issued_at": int(datetime.now(timezone.utc).timestamp()),
     }
 
     return jwt.encode(jwt_payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
