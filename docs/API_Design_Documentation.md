@@ -1,12 +1,8 @@
 # API Design Documentation for a Simple CRUD Endpoint with OAuth
 
-To be built in Python with FastAPI.
-
----
-
 ## Auth Endpoints
 
-Includes registering a user as well as obtaining and refreshing access/refresh tokens.
+Includes registering a user as well as obtaining and renewing access/refresh tokens.
 
 
 
@@ -39,7 +35,7 @@ Includes registering a user as well as obtaining and refreshing access/refresh t
 * `400 Bad Request`: If invalid or incomplete fields are given.
 * `409 Conflict`: User already exists.
 
-
+---
 
 ### Obtain a pair of Access and Refresh Tokens
 **Endpoint:** `POST /api/v1/oauth/token`
@@ -69,6 +65,7 @@ Includes registering a user as well as obtaining and refreshing access/refresh t
 **Error Responses:**
 * `401 Unauthorized - Invalid Grant`: Username and Password combination is invalid.
 
+---
 
 ### Obtain a new/renew the pair of Access and Refresh Tokens
 **Endpoint:** `POST /api/v1/oauth/refresh`
@@ -138,7 +135,7 @@ Main functionality of this API
 * `400 Bad Request`: Incomplete or invalid fields.
 * `422 Unprocessable Entity`: Validation Error.
 
-
+---
 
 ### Get a Specific Pin
 **Endpoint:** `GET /api/v1/pins/{pin_uuid}`
@@ -165,7 +162,7 @@ Main functionality of this API
 **Error Responses:**
 * `404 Not Found`: If the pin_id does not exist.
 
-
+---
 
 ### Get a List of Pins with Optional Filtering
 **Endpoint:** `GET /api/v1/pins`
@@ -199,7 +196,7 @@ Main functionality of this API
 **Error Responses:**
 * `400 Bad Response`: Invalid structured query.
 
-
+---
 
 ### Update a Pin
 **Endpoint:** `PATCH /api/v1/pins/{pin_uuid}`
@@ -239,7 +236,7 @@ Main functionality of this API
 * `404 Not Found`: Missing pin/invalid pin ID.
 * `422 Unprocessable Entity`: A field validation error.
 
-
+---
 
 ### Delete a Pin
 **Endpoint:** `DELETE /api/v1/pins/{pin_uuid}`
@@ -265,10 +262,10 @@ Main functionality of this API
 
 ### API Architecture Diagram
 
-[API Architecture Diagram](API_Architecture_Diagram.png)
+![API Architecture Diagram](API_Architecture_Diagram.png)
 
 
 
 ### Entity Relationship Diagram
 
-[API Entity Relationship Diagram](API_ERD.png)
+![API Entity Relationship Diagram](API_ERD.png)
