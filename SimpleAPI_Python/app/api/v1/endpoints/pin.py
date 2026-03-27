@@ -46,7 +46,7 @@ async def create_pin(
                 detail="A database error occured while creating pin.",
             )
 
-        await cursor.execute(FETCH_QUERY, (pin_id))
+        await cursor.execute(FETCH_QUERY, (pin_id,))
         pin_record = await cursor.fetchone()
 
     return PinResponse(
