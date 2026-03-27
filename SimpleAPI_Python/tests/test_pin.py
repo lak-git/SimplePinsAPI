@@ -279,3 +279,63 @@ def test_PT13(client, mock_cursor, mock_conn):
 """
 Delete Pin
 """
+
+
+def test_PT14(client, mock_cursor, mock_conn):
+    """
+    Test Case: Successfully delete a pin (owner)
+    Expected: 204 No Content and commit called
+    """
+    mock_cursor.fetchone.return_value = {"UserUUID": b"PT_UUID"}
+
+    response = client.delete("/api/v1/pins/1")
+
+    assert response.status_code == 204
+    assert response.content == b""
+
+    mock_conn.commit.assert_awaited_once()
+
+
+def test_PT15(client, mock_cursor):
+    """
+    Test Case: Try to delete a pin that doesn't exist
+    Expected: 404 Not Found
+    """
+    mock_cursor.fetchone.return_value = None
+
+    response = client.delete("/api/v1/pins/999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Pin with ID 999 not found."}
+
+
+def test_PT16(client, mock_cursor):
+    """
+    Test Case: Reject deletion if pin belongs to another user
+    Expected: 403 Forbidden
+    """
+    mock_cursor.fetchone.return_value = {"UserUUID": b"SOMEONE_ELSES_UUID"}
+
+    response = client.delete("/api/v1/pins/1")
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "Not authorized to delete this pin."}
+
+
+def test_PT17(client, mock_cursor, mock_conn):
+    """
+    Test Case: Simulate a DB crash during the DELETE statement
+    Expected: 500 Internal Server Error and rollback
+    """
+    mock_cursor.fetchone.return_value = {"UserUUID": b"PT_UUID"}
+    mock_cursor.execute.side_effect = [None, Exception("DB Deletion Crash!")]
+
+    response = client.delete("/api/v1/pins/1")
+
+    assert response.status_code == 500
+    assert response.json() == {
+        "detail": "A database error occurred while deleting the pin."
+    }
+
+    mock_conn.rollback.assert_awaited_once()
+    mock_cursor.execute.side_effect = None
