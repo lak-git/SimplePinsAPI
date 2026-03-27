@@ -122,7 +122,7 @@ Main functionality of this API
 **Expected Response (201 Created):**
 ```json
 {
-"pin_id": {uuid},
+"pin_id": {id},
 "author": {username},
 "title":{title},
 "body":{body},
@@ -138,11 +138,11 @@ Main functionality of this API
 ---
 
 ### Get a Specific Pin
-**Endpoint:** `GET /api/v1/pins/{pin_uuid}`
+**Endpoint:** `GET /api/v1/pins/{pin_id}`
 **Description:** Retrieves the details of a single pin by its ID. This endpoint is public.
 
 **Path Parameters:**
-* `pin_uuid` (string, required): The unique identifier of the pin.
+* `pin_id` (string, required): The unique identifier of the pin.
 
 **Headers:**
 * None required.
@@ -150,7 +150,7 @@ Main functionality of this API
 **Expected Response (200 OK):**
 ```json
 {
-  "pin_id": {uuid},
+  "pin_id": {id},
   "author": {username},
   "title": {title},
   "body": {body},
@@ -182,7 +182,7 @@ Main functionality of this API
 {
 "pins": [
     {
-        "pin_id": {uuid},
+        "pin_id": {id},
         "author": {username},
         "title": {title},
         "body": {body},
@@ -199,11 +199,11 @@ Main functionality of this API
 ---
 
 ### Update a Pin
-**Endpoint:** `PATCH /api/v1/pins/{pin_uuid}`
+**Endpoint:** `PATCH /api/v1/pins/{pin_id}`
 **Description:** Updates a specific pin associated with a user. Endpoint is Authenticated and one user cannot modify other user's pin.
 
 **Path Parameters:**
-* `pin_uuid` (string, required): The unique identifier of the pin.
+* `pin_id` (string, required): The unique identifier of the pin.
 
 **Headers:**
 * `Authorization: Bearer <access_token>`
@@ -220,7 +220,7 @@ Main functionality of this API
 **Expected Response (200 OK):**
 ```json
 {
-    "pin_id": {uuid},
+    "pin_id": {id},
     "author": {username},
     "title": {new title},
     "body": {body},
@@ -239,11 +239,11 @@ Main functionality of this API
 ---
 
 ### Delete a Pin
-**Endpoint:** `DELETE /api/v1/pins/{pin_uuid}`
+**Endpoint:** `DELETE /api/v1/pins/{pin_id}`
 **Description:** Deletes a specific pin associated with a user. Endpoint is Authenticated and one user cannot delete other user's pin.
 
 **Path Parameters:**
-* `pin_uuid` (string, required): The unique identifier of the pin.
+* `pin_id` (string, required): The unique identifier of the pin.
 
 **Headers:**
 * `Authorization: Bearer <access_token>`
