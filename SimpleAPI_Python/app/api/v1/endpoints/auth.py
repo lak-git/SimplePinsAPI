@@ -114,12 +114,12 @@ async def renew_acess_token(
         db_token = await cursor.fetchone()
 
         token_not_found: bool = not db_token
-        revoked_token: bool = db_token["IsRevoked"]
         if token_not_found:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Refresh Token not found in database.",
             )
+        revoked_token: bool = db_token["IsRevoked"]
         if revoked_token:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
