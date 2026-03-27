@@ -1,6 +1,6 @@
 import logging
 from app.api.dependencies import get_db, get_current_user
-from app.schemas.pin import PinCreate, PinResponse, PinListResponse
+from app.schemas.pin import PinCreate, PinResponse, PinListResponse, PinUpdate
 from aiomysql import Connection, DictCursor
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -152,3 +152,78 @@ async def get_pins(
     pin_responses = [PinResponse(**record) for record in records]
 
     return PinListResponse(pins=pin_responses)
+
+
+UPDATE_PIN_CHECK_QUERY = "SELECT UserUUID FROM Pin WHERE PinID = %s"
+UPDATE_PIN_QUERY = """
+SELECT 
+    p.PinID AS pin_id, 
+    u.Username AS author, 
+    p.Title AS title, 
+    p.Body AS body, 
+    p.ImageLink AS image_link, 
+    p.CreatedAt AS created_at
+FROM Pin p
+JOIN User u ON p.UserUUID = u.UserUUID
+WHERE p.PinID = %s
+"""
+
+
+@router.patch("/{pin_id}", status_code=status.HTTP_200_OK, response_model=PinResponse)
+async def update_pin(
+    pin_id: int,
+    pin_in: PinUpdate,
+    current_user: dict = Depends(get_current_user),
+    conn: Connection = Depends(get_db),
+):
+    async with conn.cursor(DictCursor) as cursor:
+        await cursor.execute(UPDATE_PIN_CHECK_QUERY, (pin_id,))
+        existing_pin = await cursor.fetchone()
+
+        pin_does_not_exist: bool = not existing_pin
+        if pin_does_not_exist:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Pin with ID {pin_id} not found.",
+            )
+        not_users_pin: bool = existing_pin["UserUUID"] != current_user["user_uuid"]
+        if not_users_pin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to update this pin.",
+            )
+
+        update_data = pin_in.model_dump(exclude_unset=True)
+        no_pin_update: bool = not update_data
+        if no_pin_update:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No valid fields provided for update.",
+            )
+
+        set_clauses = []
+        query_params = []
+        column_mapping = {"title": "Title", "body": "Body", "image_link": "ImageLink"}
+        for field, value in update_data.items():
+            db_column = column_mapping[field]
+            set_clauses.append(f"{db_column} = %s")
+            query_params.append(value)
+        set_clause_string = ", ".join(set_clauses)
+        query_params.append(pin_id)
+        update_query = f"UPDATE Pin SET {set_clause_string} WHERE PinID = %s"
+
+        try:
+            await cursor.execute(update_query, tuple(query_params))
+            await conn.commit()
+        except Exception as e:
+            await conn.rollback()
+            print(f"Database Error during update_pin: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="A database error occurred while updating the pin.",
+            )
+
+        await cursor.execute(UPDATE_PIN_QUERY, (pin_id,))
+        updated_record = await cursor.fetchone()
+
+    return PinResponse(**updated_record)

@@ -20,3 +20,9 @@ class PinResponse(BaseModel):
 
 class PinListResponse(BaseModel):
     pins: List[PinResponse]
+
+
+class PinUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=255)
+    body: Optional[str] = None
+    image_link: Optional[str] = Field(None, max_length=2048)
