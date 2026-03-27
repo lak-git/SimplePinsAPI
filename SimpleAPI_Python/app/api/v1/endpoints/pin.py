@@ -55,3 +55,37 @@ async def create_pin(
         image_link=pin_in.image_link,
         created_at=pin_record["CreatedAt"],
     )
+
+
+GET_PIN_QUERY = """
+SELECT 
+    p.PinID AS pin_id, 
+    u.Username AS author, 
+    p.Title AS title, 
+    p.Body AS body, 
+    p.ImageLink AS image_link, 
+    p.CreatedAt AS created_at
+FROM Pin p
+JOIN User u ON p.UserUUID = u.UserUUID
+WHERE p.PinID = %s
+"""
+
+
+@router.get("/{pin_id}", status_code=status.HTTP_200_OK, response_model=PinResponse)
+async def get_pin(pin_id: int, conn: Connection = Depends(get_db)):
+    """
+    Retrieves the details of a single pin by its ID. This endpoint is public.
+    """
+    async with conn.cursor(DictCursor) as cursor:
+        await cursor.execute(GET_PIN_QUERY, (pin_id,))
+        pin_record = await cursor.fetchone()
+
+        pin_not_found: bool = not pin_record
+        if pin_not_found:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Pin with ID {pin_id} not found.",
+            )
+
+    # Dictionary unpacking
+    return PinResponse(**pin_record)
