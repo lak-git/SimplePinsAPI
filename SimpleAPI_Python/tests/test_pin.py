@@ -73,3 +73,41 @@ def test_PT03(client):
     response = client.post("/api/v1/pins/", json=test_payload)
 
     assert response.status_code == 401
+
+
+def test_PT04(client, mock_cursor):
+    """
+    Test Case: Fetch an existing pin by its valid ID
+    Expected: 200 OK and the Pin data
+    """
+    fake_time = datetime.now(timezone.utc)
+
+    mock_cursor.fetchone.return_value = {
+        "pin_id": 1,
+        "author": "PT_Username",
+        "title": "Fetched Title",
+        "body": "Fetched Body",
+        "image_link": "https://example.com/fetched.png",
+        "created_at": fake_time,
+    }
+
+    response = client.get("/api/v1/pins/1")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["pin_id"] == 1
+    assert data["author"] == "PT_Username"
+    assert data["title"] == "Fetched Title"
+
+
+def test_PT05(client, mock_cursor):
+    """
+    Test Case: Return error when fetching a non-existent pin ID
+    Expected: 404 Not Found
+    """
+    mock_cursor.fetchone.return_value = None
+
+    response = client.get("/api/v1/pins/999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Pin with ID 999 not found."}
