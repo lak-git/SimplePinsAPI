@@ -3,7 +3,7 @@ from app.api.dependencies import get_db, get_current_user
 from app.schemas.pin import PinCreate, PinResponse, PinListResponse, PinUpdate
 from aiomysql import Connection, DictCursor
 from datetime import date
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Response
 from typing import Optional
 
 
@@ -227,3 +227,44 @@ async def update_pin(
         updated_record = await cursor.fetchone()
 
     return PinResponse(**updated_record)
+
+
+DELETE_CHECK_QUERY = "SELECT UserUUID FROM Pin WHERE PinID = %s"
+DELETE_QUERY = "DELETE FROM Pin WHERE PinID = %s"
+
+
+@router.delete("/{pin_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_pin(
+    pin_id: int,
+    current_user: dict = Depends(get_current_user),
+    conn: Connection = Depends(get_db),
+):
+    async with conn.cursor(DictCursor) as cursor:
+        await cursor.execute(DELETE_CHECK_QUERY, (pin_id,))
+        existing_pin = await cursor.fetchone()
+
+        pin_not_found: bool = not existing_pin
+        if pin_not_found:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Pin with ID {pin_id} not found.",
+            )
+        not_users_pin: bool = existing_pin["UserUUID"] != current_user["user_uuid"]
+        if not_users_pin:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorized to delete this pin.",
+            )
+
+        try:
+            await cursor.execute(DELETE_QUERY, (pin_id,))
+            await conn.commit()
+        except Exception as e:
+            await conn.rollback()
+            logger.error(f"Database Error during delete_pin: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="A database error occurred while deleting the pin.",
+            )
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
