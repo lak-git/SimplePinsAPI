@@ -15,8 +15,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Simple Pins API",
-    description="Simple Pins API implementation with OAuth, for Week 2 Dev Onboarding",
-    version="0.1.0",
+    description="Simple Pins API implementation with OAuth + Unit Testing, for Week 2 Dev Onboarding",
+    version="0.2.0",
     lifespan=lifespan,
 )
 app.include_router(api_router, prefix="/api/v1")
