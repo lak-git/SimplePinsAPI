@@ -1,8 +1,10 @@
 import logging
 from app.api.dependencies import get_db, get_current_user
-from app.schemas.pin import PinCreate, PinResponse
+from app.schemas.pin import PinCreate, PinResponse, PinListResponse
 from aiomysql import Connection, DictCursor
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import date
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Optional
 
 
 router = APIRouter()
@@ -89,3 +91,64 @@ async def get_pin(pin_id: int, conn: Connection = Depends(get_db)):
 
     # Dictionary unpacking
     return PinResponse(**pin_record)
+
+
+GET_PINS_QUERY = """
+SELECT 
+    p.PinID AS pin_id, 
+    u.Username AS author, 
+    p.Title AS title, 
+    p.Body AS body, 
+    p.ImageLink AS image_link, 
+    p.CreatedAt AS created_at
+FROM Pin p
+JOIN User u ON p.UserUUID = u.UserUUID
+WHERE 1=1
+"""
+
+
+@router.get("/", status_code=status.HTTP_200_OK, response_model=PinListResponse)
+async def get_pins(
+    author: Optional[str] = Query(None, description="Filter by author (username)"),
+    title: Optional[str] = Query(None, description="Filter by exact or partial title"),
+    created_at: Optional[date] = Query(
+        None, description="Filter by exact creation date (YYYY-MM-DD)"
+    ),
+    sort_by: Optional[str] = Query(
+        "created_at", description="Sort by: title, author, or created_at"
+    ),
+    order: Optional[str] = Query("desc", description="Sort order: asc or desc"),
+    conn: Connection = Depends(get_db),
+):
+    async with conn.cursor(DictCursor) as cursor:
+        query_params = []
+        conditions = ""
+        if author:
+            conditions += " AND u.Username = %s"
+            query_params.append(author)
+        if title:
+            conditions += " AND p.Title LIKE %s"
+            query_params.append(f"%{title}%")
+        if created_at:
+            conditions += " AND DATE(p.CreatedAt) = %s"
+            query_params.append(created_at)
+
+        allowed_sort_columns = {
+            "title": "p.Title",
+            "author": "u.Username",
+            "created_at": "p.CreatedAt",
+        }
+        secure_sort_column = allowed_sort_columns.get(sort_by.lower(), "p.CreatedAt")
+        secure_order = "ASC" if order.lower() == "asc" else "DESC"
+        final_query = f"{GET_PINS_QUERY} {conditions} ORDER BY {secure_sort_column} {secure_order}"
+
+        try:
+            await cursor.execute(final_query, tuple(query_params))
+            records = await cursor.fetchall()
+        except Exception as e:
+            print(f"Database Error during get_pins: {e}")
+            raise HTTPException(status_code=500, detail="Database error occurred.")
+
+    pin_responses = [PinResponse(**record) for record in records]
+
+    return PinListResponse(pins=pin_responses)

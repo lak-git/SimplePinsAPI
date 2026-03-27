@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 
 class PinCreate(BaseModel):
@@ -16,3 +16,7 @@ class PinResponse(BaseModel):
     body: Optional[str] = None
     image_link: Optional[str] = None
     created_at: datetime
+
+
+class PinListResponse(BaseModel):
+    pins: List[PinResponse]
