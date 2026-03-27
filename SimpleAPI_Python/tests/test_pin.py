@@ -183,3 +183,99 @@ def test_PT08(client, mock_cursor):
     assert response.json() == {"detail": "Database error occurred."}
 
     mock_cursor.execute.side_effect = None
+
+
+"""
+Update Pin
+"""
+
+
+def test_PT09(client, mock_cursor, mock_conn):
+    """
+    Test Case: Successfully update a pin's title (owner)
+    Expected: 200 OK, updated PinResponse, and commit called
+    """
+    fake_time = datetime.now(timezone.utc)
+    mock_cursor.fetchone.side_effect = [
+        {"UserUUID": b"PT_UUID"},
+        {
+            "pin_id": 1,
+            "author": "PT_Username",
+            "title": "A Brand New Title",
+            "body": "Original Body",
+            "image_link": "Original Link",
+            "created_at": fake_time,
+        },
+    ]
+
+    test_payload = {"title": "A Brand New Title"}
+
+    response = client.patch("/api/v1/pins/1", json=test_payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["title"] == "A Brand New Title"
+    assert data["body"] == "Original Body"
+
+    mock_conn.commit.assert_awaited_once()
+    mock_cursor.fetchone.side_effect = None
+
+
+def test_PT10(client, mock_cursor):
+    """
+    Test Case: Try to update a pin that doesn't exist.
+    Expected: 404 Not Found.
+    """
+    mock_cursor.fetchone.return_value = None
+
+    response = client.patch("/api/v1/pins/999", json={"title": "new title"})
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Pin with ID 999 not found."}
+
+
+def test_PT11(client, mock_cursor):
+    """
+    Test Case: Reject update if pin belongs to another user.
+    Expected: 403 Forbidden.
+    """
+    mock_cursor.fetchone.return_value = {"UserUUID": b"SOME_OTHER_UUID_"}
+
+    response = client.patch("/api/v1/pins/1", json={"title": "Hacked Title"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "Not authorized to update this pin."}
+
+
+def test_PT12(client, mock_cursor):
+    """
+    Test Case: Send a PATCH request with no fields to update.
+    Expected: 400 Bad Request.
+    """
+    mock_cursor.fetchone.return_value = {"UserUUID": b"PT_UUID"}
+
+    response = client.patch("/api/v1/pins/1", json={})
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "No valid fields provided for update."}
+
+
+def test_PT13(client, mock_cursor, mock_conn):
+    """
+    Test Case: Simulate a DB crash during the UPDATE statement.
+    Expected: 500 Internal Server Error and rollback.
+    """
+    mock_cursor.fetchone.return_value = {"UserUUID": b"PT_UUID"}
+    mock_cursor.execute.side_effect = [None, Exception("DB Write Crash!")]
+
+    response = client.patch("/api/v1/pins/1", json={"title": "Crash Title"})
+
+    assert response.status_code == 500
+
+    mock_conn.rollback.assert_awaited_once()
+    mock_cursor.execute.side_effect = None
+
+
+"""
+Delete Pin
+"""
