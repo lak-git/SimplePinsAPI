@@ -111,3 +111,75 @@ def test_PT05(client, mock_cursor):
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Pin with ID 999 not found."}
+
+
+def test_PT06(client, mock_cursor):
+    """
+    Test Case: Fetch a list of pins without any filter
+    Expected: 200 OK and a list of Pin data
+    """
+    fake_time = datetime.now(timezone.utc)
+    mock_cursor.fetchall.return_value = [
+        {
+            "pin_id": 101,
+            "author": "UserA",
+            "title": "First Pin",
+            "body": "Body A",
+            "image_link": "linkA.png",
+            "created_at": fake_time,
+        },
+        {
+            "pin_id": 102,
+            "author": "UserB",
+            "title": "Second Pin",
+            "body": "Body B",
+            "image_link": "linkB.png",
+            "created_at": fake_time,
+        },
+    ]
+
+    response = client.get("/api/v1/pins/")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "pins" in data
+    assert len(data["pins"]) == 2
+    assert data["pins"][0]["title"] == "First Pin"
+    assert data["pins"][1]["author"] == "UserB"
+
+
+def test_PT07(client, mock_cursor):
+    """
+    Test Case: Fetch a list of pins using query parameters
+    Expected: 200 OK, and the generated SQL query must match the filters
+    """
+    mock_cursor.fetchall.return_value = []
+
+    response = client.get(
+        "/api/v1/pins/?author=TargetUser&title=Cool&sort_by=title&order=asc"
+    )
+
+    assert response.status_code == 200
+    called_args = mock_cursor.execute.call_args[0]
+    generated_sql = called_args[0]
+    sql_parameters = called_args[1]
+
+    assert "AND u.Username = %s" in generated_sql
+    assert "AND p.Title LIKE %s" in generated_sql
+    assert "ORDER BY p.Title ASC" in generated_sql
+    assert sql_parameters == ("TargetUser", "%Cool%")
+
+
+def test_PT08(client, mock_cursor):
+    """
+    Test Case: Simulate a database crash during fetching
+    Expected: 500 Internal Server Error
+    """
+    mock_cursor.execute.side_effect = Exception("Simulated Read Error")
+
+    response = client.get("/api/v1/pins/")
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Database error occurred."}
+
+    mock_cursor.execute.side_effect = None
