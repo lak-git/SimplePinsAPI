@@ -50,7 +50,7 @@ jobs:
       run: uv sync --frozen
 
     - name: Load Database Schema
-      run: mysql -h 127.0.0.1 -u root simple_pins_api < SimpleAPI_Python/migrations/schema.sql
+      run: mysql -h 127.0.0.1 -u root simple_pins_api < migrations/schema.sql
 
     - name: Run Unit Tests [DEBUG MODE]
       run: uv run pytest tests/test_user.py -v
