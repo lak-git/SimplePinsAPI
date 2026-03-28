@@ -1,4 +1,4 @@
-name: CI/CD Pipeline with GitHub Actions/GKE
+name: CI/CD Pipeline
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: simple_pins_api_db
+          MYSQL_DATABASE: simple_pins_api
         ports:
           - 3306:3306
         options: >-
@@ -48,6 +48,9 @@ jobs:
 
     - name: Install dependencies
       run: uv sync --frozen
+
+    - name: Load Database Schema
+      run: mysql -h 127.0.0.1 -u root simple_pins_api < SimpleAPI_Python/migrations/schema.sql
 
     - name: Run Unit Tests [DEBUG MODE]
       run: uv run pytest tests/test_user.py -v
