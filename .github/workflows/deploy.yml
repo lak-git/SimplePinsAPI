@@ -112,3 +112,15 @@ jobs:
         # Swap Placeholder and Deploy API
         sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" k8s/api.yaml
         kubectl apply -f k8s/api.yaml
+
+    - name: Run Production Database Migrations
+      run: |
+        # Create a ConfigMap containing your SQL schema
+        kubectl create configmap schema-config --from-file=schema-config=migrations/schema.sql \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+        # Delete any old migration jobs if they exist
+        kubectl delete job schema-migration --ignore-not-found
+
+        # Start the migration job
+        kubectl apply -f k8s/migrate.yaml
