@@ -10,10 +10,11 @@ from app.core.security import (
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
     JWT_REFRESH_TOKEN_EXPIRE_DAYS,
 )
+from app.core.limiter import limiter
 from app.schemas.token import TokenResponse, RefreshToken
 from aiomysql import Connection, DictCursor
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 
 
@@ -32,8 +33,11 @@ logger = logging.getLogger(__name__)
 
 
 @router.post("/token", response_model=TokenResponse)
+@limiter.limit("10/minute")
 async def obtain_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), conn: Connection = Depends(get_db)
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    conn: Connection = Depends(get_db),
 ) -> TokenResponse:
     async with conn.cursor(DictCursor) as cursor:
         await cursor.execute(SELECT_QUERY, (form_data.username))

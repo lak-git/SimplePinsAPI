@@ -9,9 +9,10 @@ from app.core.security import (
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
     JWT_REFRESH_TOKEN_EXPIRE_DAYS,
 )
+from app.core.limiter import limiter
 from app.schemas.user import UserCreate, UserRegistrationResponse
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 
 
 CHECK_QUERY = "SELECT UserUUID FROM User WHERE Username = %s"
@@ -31,8 +32,9 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/", status_code=status.HTTP_201_CREATED, response_model=UserRegistrationResponse
 )
+@limiter.limit("5/minute")  # 5 accounts per minute
 async def register_user(
-    user_in: UserCreate, conn: Connection = Depends(get_db)
+    request: Request, user_in: UserCreate, conn: Connection = Depends(get_db)
 ) -> UserRegistrationResponse:
     async with conn.cursor(DictCursor) as cursor:
         await cursor.execute(CHECK_QUERY, (user_in.username,))
