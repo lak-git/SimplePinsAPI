@@ -49,11 +49,12 @@ jobs:
     - name: Install dependencies
       run: uv sync --frozen
 
+    # Required pre-requisit for tests
     - name: Load Database Schema
       run: mysql -h 127.0.0.1 -u root simple_pins_api < migrations/schema.sql
 
-    - name: Run Unit Tests [DEBUG MODE]
-      run: uv run pytest tests/test_user.py -v
+    - name: Run Unit Tests
+      run: uv run pytest -v
 
     # Google Cloud Authentication (WIF)
     - name: Authenticate to Google Cloud
