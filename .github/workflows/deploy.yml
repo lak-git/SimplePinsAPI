@@ -2,7 +2,9 @@ name: CI/CD Pipeline with GitHub Actions/GKE
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - "main"
+      - "POB-511/GKE-Deployment"
 
 permissions:
   contents: read
@@ -12,6 +14,10 @@ jobs:
   test-and-deploy:
     name: Test, Build, and Deploy
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./SimpleAPI_Python
 
     steps:
     - name: Checkout Code
