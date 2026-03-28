@@ -1,12 +1,13 @@
 import bcrypt
 import jwt
-from app.core.config import JWT_SECRET_KEY, JWT_ALGORITHM
+from app.core.config import (
+    JWT_SECRET_KEY,
+    JWT_ALGORITHM,
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS
+    )
 from datetime import datetime, timedelta, timezone
 from typing import Any, Union
-
-
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 15
-JWT_REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 
 def hash_password(password: str) -> str:

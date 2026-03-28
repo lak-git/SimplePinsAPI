@@ -2,13 +2,16 @@ import jwt
 import logging
 import uuid
 from app.api.dependencies import get_db
-from app.core.config import JWT_ALGORITHM, JWT_SECRET_KEY
+from app.core.config import (
+    JWT_ALGORITHM,
+    JWT_SECRET_KEY,
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS
+)
 from app.core.security import (
     create_access_token,
     create_refresh_token,
-    verify_password,
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
-    JWT_REFRESH_TOKEN_EXPIRE_DAYS,
+    verify_password
 )
 from app.core.limiter import limiter
 from app.schemas.token import TokenResponse, RefreshToken

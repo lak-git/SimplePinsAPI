@@ -2,12 +2,11 @@ import logging
 import uuid
 from aiomysql import Connection, DictCursor
 from app.api.dependencies import get_db
+from app.core.config import JWT_ACCESS_TOKEN_EXPIRE_MINUTES, JWT_REFRESH_TOKEN_EXPIRE_DAYS
 from app.core.security import (
     hash_password,
     create_access_token,
-    create_refresh_token,
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES,
-    JWT_REFRESH_TOKEN_EXPIRE_DAYS,
+    create_refresh_token
 )
 from app.core.limiter import limiter
 from app.schemas.user import UserCreate, UserRegistrationResponse
