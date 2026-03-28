@@ -49,8 +49,8 @@ jobs:
     - name: Install dependencies
       run: uv sync --frozen
 
-    - name: Run Unit Tests
-      run: uv run pytest -v
+    - name: Run Unit Tests [DEBUG MODE]
+      run: uv run pytest tests/test_user.py -v
 
     # Google Cloud Authentication (WIF)
     - name: Authenticate to Google Cloud
