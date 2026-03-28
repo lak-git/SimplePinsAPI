@@ -116,7 +116,7 @@ jobs:
     - name: Run Production Database Migrations
       run: |
         # Create a ConfigMap containing your SQL schema
-        kubectl create configmap schema-config --from-file=schema-config=migrations/schema.sql \
+        kubectl create configmap schema-config --from-file=schema.sql=migrations/schema.sql \
           --dry-run=client -o yaml | kubectl apply -f -
 
         # Delete any old migration jobs if they exist

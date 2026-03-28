@@ -16,9 +16,7 @@ spec:
               echo "Waiting for database..."
               sleep 2
             done
-            mysql -h mysql-service -u root -p"$DB_PASSWORD" simple_pins_api <<EOF
-            $(cat /migrations/schema.sql)
-            EOF
+            mysql -h mysql-service -u root -p"$DB_PASSWORD" simple_pins_api < /migrations/schema.sql
         env:
         - name: DB_PASSWORD
           valueFrom:
