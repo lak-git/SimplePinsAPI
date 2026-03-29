@@ -1,0 +1,125 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test-and-deploy:
+    name: Test, Build, and Deploy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./SimpleAPI_Python
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: simple_pins_api
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Automated Unit Testing
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+
+    - name: Install dependencies
+      run: uv sync --frozen
+
+    # Required pre-requisit for tests
+    - name: Load Database Schema
+      run: mysql -h 127.0.0.1 -u root simple_pins_api < migrations/schema.sql
+
+    - name: Run Unit Tests
+      run: uv run pytest -v
+
+    # Google Cloud Authentication (WIF)
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+        service_account: '${{ secrets.SA_EMAIL }}'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    # 3. GCP Secret Manager Integration
+    - name: Fetch Secrets from GCP Secret Manager
+      id: fetch-secrets
+      uses: google-github-actions/get-secretmanager-secrets@v2
+      with:
+        secrets: |-
+          db_password:projects/${{ secrets.GCP_PROJECT_ID }}/secrets/DB_PASSWORD/versions/latest
+          jwt_secret:projects/${{ secrets.GCP_PROJECT_ID }}/secrets/JWT_SECRET_KEY/versions/latest
+
+    # Build and Push Docker Image
+    - name: Configure Docker Auth
+      run: gcloud auth configure-docker asia-southeast1-docker.pkg.dev --quiet
+
+    - name: Build and Push Container
+      env:
+        IMAGE_NAME: asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/simple-pins-api-repo/simple-pins-api_python:${{ github.sha }}
+      run: |
+        docker build -t $IMAGE_NAME .
+        docker push $IMAGE_NAME
+
+    # Deploy to GKE
+    - name: Get GKE Credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: simple-pins-api-cluster
+        location: asia-southeast1-a
+
+    - name: Deploy Database and API
+      env:
+        IMAGE_NAME: asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/simple-pins-api-repo/simple-pins-api_python:${{ github.sha }}
+        DB_PASS: ${{ steps.fetch-secrets.outputs.db_password }}
+        JWT_SEC: ${{ steps.fetch-secrets.outputs.jwt_secret }}
+      run: |
+        # Inject Secrets into Kubernetes
+        kubectl create secret generic api-secrets \
+          --from-literal=DB_PASSWORD="$DB_PASS" \
+          --from-literal=JWT_SECRET_KEY="$JWT_SEC" \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+        # Deploy Database
+        kubectl apply -f k8s/mysql.yaml
+
+        # Swap Placeholder and Deploy API
+        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_NAME|g" k8s/api.yaml
+        kubectl apply -f k8s/api.yaml
+
+    - name: Run Production Database Migrations
+      run: |
+        # Create a ConfigMap containing your SQL schema
+        kubectl create configmap schema-config --from-file=schema.sql=migrations/schema.sql \
+          --dry-run=client -o yaml | kubectl apply -f -
+
+        # Delete any old migration jobs if they exist
+        kubectl delete job schema-migration --ignore-not-found
+
+        # Start the migration job
+        kubectl apply -f k8s/migrate.yaml
