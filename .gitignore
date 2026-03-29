@@ -5,7 +5,8 @@
 **/dist/
 **/wheels/
 *.egg-info
-**/app/core/config.py
 
 # Virtual environments
 .venv
+
+.env
