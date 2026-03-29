@@ -33,7 +33,7 @@ def test_AT01(client, mock_cursor):
     assert "refresh_token" in data
     assert data["token_type"] == "bearer"
 
-    assert mock_cursor.execute.call_count == 2
+    assert mock_cursor.execute.call_count == 3
 
 
 def test_AT02(client, mock_cursor):
