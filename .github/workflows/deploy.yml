@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "main"
-      - "POB-511/GKE-Deployment"
 
 permissions:
   contents: read
